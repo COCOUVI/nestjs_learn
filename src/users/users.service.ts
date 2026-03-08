@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { UpdateUserDto } from 'src/dto/update-user.dto';
 import { User } from 'types/userType';
@@ -6,6 +8,10 @@ import { User } from 'types/userType';
 @Injectable()
 export class UsersService {
 
+
+    constructor(private readonly databaseService: DatabaseService) {
+
+      }
     private users: User[] = [
         { id: 1, name: "Alice", email: "alice@example.com", password: "password123" },
         { id: 2, name: "Bob", email: "bob@example.com", password: "password456" },
@@ -25,15 +31,13 @@ export class UsersService {
         return user;
     }
 
-    create(user: CreateUserDto): User {
-        const newid = (this.users.length + 1);
-        const newUser: User = {
-            ...user,
-            id: newid,
-        }
-        this.users.push(newUser);
-
-        return newUser;
+    create(user: Prisma.UserCreateInput) {
+       
+        const { email, password } = CreateUserDto
+        const hashedPassword =  bcrypt.
+        return this.databaseService.user.create({
+           
+        })
 
     }
     update(id: number, user: UpdateUserDto): User{
