@@ -10,6 +10,7 @@ import { LangueModule } from './langue/langue.module';
 import { Throttle, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrotttlerBehindProxyGuard } from './guards/throttle-behind-proxy.guard';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [ThrottlerModule.forRoot([
@@ -28,7 +29,7 @@ import { ThrotttlerBehindProxyGuard } from './guards/throttle-behind-proxy.guard
       ttl:100000,
       limit:100 
     },
-  ]),UsersModule, DatabaseModule,LangueModule],
+  ]),UsersModule, DatabaseModule,LangueModule, AuthModule],
   controllers: [AppController,  UsersController],
   providers: [
     {
