@@ -60,7 +60,7 @@ export class AuthService {
         if (!langue) {
             throw new NotFoundException("Langue invalide")
         }
-        const hashedPassword = bcrypt.hashedPassword(password, 10)
+        const hashedPassword =  await bcrypt.hash(password, 10)
         return this.databaseService.user.create({
             data: {
                 name,

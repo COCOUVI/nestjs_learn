@@ -32,11 +32,11 @@ export class UsersController {
     findOne(@Param('id', ParseIntPipe) id: number): User {
         return this.usersService.findOne(id);
     }
-    @Post()
-    @HttpCode(201)
-    create(@Body() User: CreateUserDto): User {
-        return this.usersService.create(User);
-    }
+    // @Post()
+    // @HttpCode(201)
+    // create(@Body() User: CreateUserDto): User {
+    //     // return this.usersService.create(User);
+    // }
     @Patch(':id')
     @HttpCode(201)
     update(@Param('id') id: number, @Body() User: UpdateUserDto): UpdateUserDto {

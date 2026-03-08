@@ -31,15 +31,15 @@ export class UsersService {
         return user;
     }
 
-    create(user: Prisma.UserCreateInput) {
+    // create(user: Prisma.UserCreateInput) {
        
-        const { email, password } = CreateUserDto
-        const hashedPassword =  bcrypt.
-        return this.databaseService.user.create({
+    //     const { email, password } = CreateUserDto
+    //     const hashedPassword =  bcrypt.
+    //     return this.databaseService.user.create({
            
-        })
+    //     })
 
-    }
+    // }
     update(id: number, user: UpdateUserDto): User{
 
         const index = this.users.findIndex((use) => use.id === id)
