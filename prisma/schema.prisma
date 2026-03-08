@@ -1,0 +1,138 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  langueId  Int
+  langue    Langue   @relation(fields: [langueId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contenus Contenu[] @relation("Auteur")
+
+  commentaires Commentaire[]
+}
+
+model Region {
+  id           Int     @id @default(autoincrement())
+  nom          String
+  description  String? @db.Text
+  population   Int
+  superficie   Decimal
+  localisation String
+
+  contenus Contenu[]
+
+  parlers Parler[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Langue {
+  id          Int     @id @default(autoincrement())
+  nom         String
+  code        String
+  description String? @db.Text
+  users       User[]
+
+  contenus Contenu[]
+
+  parlers Parler[]
+}
+
+model TypeContenu {
+  id  Int    @id @default(autoincrement())
+  nom String @unique
+
+  contenus Contenu[]
+}
+
+model TypeMedia {
+  id     Int     @id @default(autoincrement())
+  nom    String  @unique
+  medias Media[]
+}
+
+model Contenu {
+  id       Int       @id @default(autoincrement())
+  titre    String
+  texte    String?   @db.Text
+  statut   Statut    @default(PENDING)
+  parentId Int?
+  parent   Contenu?  @relation("ContenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children Contenu[] @relation("ContenuHierarchy")
+  regionId Int
+  region   Region    @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  langueId Int
+  langue   Langue    @relation(fields: [langueId], references: [id], onDelete: Cascade)
+
+  auteurId Int
+  auteur   User @relation("Auteur", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  typeContenuId Int
+  type_contenu  TypeContenu @relation(fields: [typeContenuId], references: [id], onDelete: Cascade)
+
+  medias Media[]
+
+  commentaires Commentaire[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+enum Statut {
+  SUCCESS
+  PENDING
+  FAILED
+}
+
+model Media {
+  id          Int       @id @default(autoincrement())
+  chemin      String
+  description String?
+  typemediaId Int
+  type_media  TypeMedia @relation(fields: [typemediaId], references: [id], onDelete: Cascade)
+  contenuId   Int
+  contenu     Contenu   @relation(fields: [contenuId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Commentaire {
+  id        Int      @id @default(autoincrement())
+  texte     String?  @db.Text
+  note      Int
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contenuId Int
+  contenu   Contenu  @relation(fields: [contenuId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Parler {
+  regionId Int
+  region   Region @relation(fields: [regionId], references: [id])
+  langueId Int
+  langue   Langue @relation(fields: [langueId], references: [id], onDelete: Cascade)
+
+  @@id([regionId, langueId])
+}
