@@ -1,8 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from 'src/dto/create-user.dto';
+import { LoginDto } from 'src/dto/login.dto';
 @Injectable()
 export class AuthService {
 
@@ -10,21 +11,34 @@ export class AuthService {
     // Injecte le service JWT pour gérer la création et la vérification des tokens
     constructor(private jwtService: JwtService, private readonly databaseService: DatabaseService) { }
 
-    // Méthode pour authentifier un utilisateur et générer un token JWT
-    async login(user: any) {
-        // Création du payload du token JWT
-        // sub : identifiant unique de l'utilisateur (subject)
-        // email : adresse email de l'utilisateur
-        const payload = {
-            sub: user.id,
-            email: user.email
+    async login(loginDto: LoginDto) {
+
+        const { email, password } = loginDto
+
+        const user = await this.databaseService.user.findUnique({
+            where: { email }
+        })
+
+        if (!user) {
+            throw new UnauthorizedException("Email ou mot de passe incorrect")
         }
 
-        // Retourne un objet contenant le token d'accès (access_token)
-        // Le token est signé avec le payload et la clé secrète
+        const passwordValid = await bcrypt.compare(password, user.password)
+
+        if (!passwordValid) {
+            throw new UnauthorizedException("Email ou mot de passe incorrect")
+        }
+
+        const payload = {
+            sub: user.id,
+            email: user.email,
+            role: user.role
+        }
+
         return {
             access_token: this.jwtService.sign(payload)
         }
+
     }
 
 
